@@ -1,1 +1,1 @@
-# java-grupo9
+# Repositório destinado ao JAVA do projeto
