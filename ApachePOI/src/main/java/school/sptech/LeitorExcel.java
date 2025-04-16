@@ -15,7 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class LeitorExcel {
 
-    public List<Livro> extrarLivros(String nomeArquivo, InputStream arquivo) {
+    public List<DadosEleva> extrairDados(String nomeArquivo, InputStream arquivo) {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 
@@ -29,7 +29,7 @@ public class LeitorExcel {
 
             Sheet sheet = workbook.getSheetAt(0);
 
-            List<Livro> livrosExtraidos = new ArrayList<>();
+            List<DadosEleva> dadosExtraidos = new ArrayList<>();
 
             // Iterando sobre as linhas da planilha
             for (Row row : sheet) {
@@ -37,7 +37,7 @@ public class LeitorExcel {
                 if (row.getRowNum() == 0) {
                     System.out.println("\nLendo cabeçalho");
 
-                    for (int i = 0; i < 4; i++) {
+                    for (int i = 0; i < 6; i++) {
                         String coluna = row.getCell(i).getStringCellValue();
                         System.out.println("Coluna " + i + ": " + coluna);
                     }
@@ -46,16 +46,18 @@ public class LeitorExcel {
                     continue;
                 }
 
-                // Extraindo valor das células e criando objeto Livro
+                // Extraindo valor das células e criando objeto DadosEleva
                 System.out.println("Lendo linha " + row.getRowNum());
 
-                Livro livro = new Livro();
-                livro.setId((int) row.getCell(0).getNumericCellValue());
-                livro.setTitulo(row.getCell(1).getStringCellValue());
-                livro.setAutor(row.getCell(2).getStringCellValue());
-                livro.setDataLancamento(converterDate(row.getCell(3).getDateCellValue()));
+                DadosEleva dadosEleva = new DadosEleva();
+                dadosEleva.setData(converterDate (row.getCell(0).getDateCellValue()));
+                dadosEleva.setUf(row.getCell(1).getStringCellValue());
+                dadosEleva.setRegiao(row.getCell(2).getStringCellValue());
+                dadosEleva.setClasse(row.getCell(3).getStringCellValue());
+                dadosEleva.setConsumo(row.getCell(4).getNumericCellValue());
+                dadosEleva.setConsumidores((long)row.getCell(5).getNumericCellValue());
 
-                livrosExtraidos.add(livro);
+                dadosExtraidos.add(dadosEleva);
             }
 
             // Fechando o workbook após a leitura
@@ -63,7 +65,7 @@ public class LeitorExcel {
 
             System.out.println("\nLeitura do arquivo finalizada\n");
 
-            return livrosExtraidos;
+            return dadosExtraidos;
         } catch (IOException e) {
             // Caso ocorra algum erro durante a leitura do arquivo uma exceção será lançada
             throw new RuntimeException(e);
