@@ -1,4 +1,4 @@
-package school.sptech;
+package grupo9.eleva.reader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +14,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class LeitorExcel {
-
+    private Integer qtdLinhas;
     public List<DadosEleva> extrairDados(String nomeArquivo, InputStream arquivo) {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
@@ -58,6 +58,7 @@ public class LeitorExcel {
                 dadosEleva.setConsumidores((long)row.getCell(5).getNumericCellValue());
 
                 dadosExtraidos.add(dadosEleva);
+                qtdLinhas++;
             }
 
             // Fechando o workbook após a leitura
@@ -70,6 +71,14 @@ public class LeitorExcel {
             // Caso ocorra algum erro durante a leitura do arquivo uma exceção será lançada
             throw new RuntimeException(e);
         }
+    }
+
+    public Integer getQtdLinhas() {
+        return qtdLinhas;
+    }
+
+    public void setQtdLinhas(Integer qtdLinhas) {
+        this.qtdLinhas = qtdLinhas;
     }
 
     private LocalDate converterDate(Date data) {
