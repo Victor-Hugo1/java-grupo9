@@ -11,14 +11,18 @@ public class ConexaoBD {
     private final DataSource dataSource;
 
     public ConexaoBD() {
+
+        //Aqui usamos métodos do JDBC para criar o nosso caminho de conexão com o banco
         BasicDataSource basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl("jdbc:h2:mem:filmes");
-        basicDataSource.setUsername("sa");
-        basicDataSource.setPassword("");
+        basicDataSource.setUrl("jdbc:mysql://localhost:3306/eleva?useSSL=false&serverTimezone=GMT-3");
+        basicDataSource.setUsername("root");
+        basicDataSource.setPassword("2808");
 
         this.dataSource = basicDataSource;
     }
 
+
+    // Aqui adicionamos tudo isso em um método para que possamos usar adiante
     public JdbcTemplate getConnection() {
         return new JdbcTemplate(dataSource);
     }

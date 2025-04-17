@@ -16,8 +16,6 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        LeitorExcel linhas = new LeitorExcel();
-
         String nomeArquivo = "Dados (Grupo 9).xlsx";
 
         // Carregando o arquivo excel
@@ -37,29 +35,21 @@ public class Main {
         }
 
         ConexaoBD dados = new ConexaoBD();
-        JdbcTemplate connection = dados.getConnection();
+        JdbcTemplate conexao = dados.getConnection();
 
-        connection.execute("""
-                CREATE TABLE dados_eleva (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    data DATE,
-                    uf VARCHAR(2),
-                    regiao VARCHAR(50),
-                    classe VARCHAR(50),
-                    consumo DOUBLE,
-                    consumidores BIGINT
-                );
-                """);
+        for (DadosEleva dado : dadosExtraidos) {
+            System.out.println("Inserindo: " + dado.getData() + " - " + dado.getUf() + " - " + dado.getRegiao() + " - "
+                    + dado.getClasse() + " - " + dado.getConsumo() + " - " + dado.getConsumidores());
 
-        DadosEleva novoDado = new ArrayList<>();
-
-        Integer qtdLinhas = linhas.getQtdLinhas();
-
-        for (int i = 0; i < qtdLinhas; i++) {
-
-            connection.update("INSERT INTO dados_eleva (data, uf, regiao, classe, consumo, consumidores) VALUES (?, ?, ?, ?, ?, ?)",
-                  novoDado.getData(), novoDado.getUf(), novoDado.(), novoDado.getDiretor());
+            conexao.update(
+                    "INSERT INTO dados_eleva (data, uf, regiao, classe, consumo, consumidores) VALUES (?, ?, ?, ?, ?, ?)",
+                    java.sql.Date.valueOf(dado.getData()),
+                    dado.getUf(),
+                    dado.getRegiao(),
+                    dado.getClasse(),
+                    dado.getConsumo(),
+                    dado.getConsumidores()
+            );
         }
-
     }
 }

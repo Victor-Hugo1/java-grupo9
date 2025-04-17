@@ -3,7 +3,7 @@ package grupo9.eleva.reader;
 import java.time.LocalDate;
 
 public class DadosEleva {
-
+    //Preciso dizer?
     private LocalDate data;
     private String uf;
     private String regiao;
