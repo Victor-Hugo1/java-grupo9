@@ -3,7 +3,9 @@ package grupo9.eleva;
 import grupo9.eleva.bdpath.ConexaoBD;
 import grupo9.eleva.reader.DadosEleva;
 import grupo9.eleva.reader.LeitorExcel;
+import grupo9.eleva.s3connection.ConnectorS3;
 import org.springframework.jdbc.core.JdbcTemplate;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +17,12 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws IOException {
+
+        //S3
+        S3Client s3Client = new ConnectorS3().getS3Client();
+        String bucketName = "eleva-s3";
+
+        //
 
         String nomeArquivo = "Dados (Grupo 9).xlsx";
 
