@@ -54,12 +54,15 @@ public class LeitorExcel {
                 dadosEleva.setData(converterDate (row.getCell(0).getDateCellValue())); // Criando o set para inserir uma data
                 // O campo acima da data esta sendo formatado e manipulado, normalmente o ApachePOI lê ele como uma String
                 // Então é necessário usar o converterDate
-
                 dadosEleva.setUf(row.getCell(1).getStringCellValue()); // Criando o set para inserir o UF
                 dadosEleva.setRegiao(row.getCell(2).getStringCellValue()); // Criando o set para Regiao
                 dadosEleva.setClasse(row.getCell(3).getStringCellValue()); // Criando o set para Classe
-                dadosEleva.setConsumo(row.getCell(4).getNumericCellValue()); // Criando o set para Consumo
-                dadosEleva.setConsumidores((long)row.getCell(5).getNumericCellValue()); // Criando o set para os consumidores
+
+                Integer consumoFormatado = (int)row.getCell(4).getNumericCellValue();
+                dadosEleva.setConsumo((double)consumoFormatado); // Criando o set para Consumo
+
+                Integer consumidorFormatado = (int)row.getCell(5).getNumericCellValue();
+                dadosEleva.setConsumidores((long) consumidorFormatado); // Criando o set para os consumidores
                 // Normalmente o getNumericCellValue pega sempre um valor inteiro, então aqui é necessário fazer um casting para transformar ele em LONG
 
                 dadosExtraidos.add(dadosEleva); // Dados extraidos e adicionados na lista
