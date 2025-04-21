@@ -50,8 +50,10 @@ public class LeitorExcel {
                // Aqui extraímos os valores das células para inserir uma a uma nos atributos criados na classe DadosEleva
                 System.out.println("Lendo linha " + row.getRowNum());
 
+
                 DadosEleva dadosEleva = new DadosEleva(); // Criando o objeto
                 dadosEleva.setData(converterDate (row.getCell(0).getDateCellValue())); // Criando o set para inserir uma data
+
                 // O campo acima da data esta sendo formatado e manipulado, normalmente o ApachePOI lê ele como uma String
                 // Então é necessário usar o converterDate
                 dadosEleva.setUf(row.getCell(1).getStringCellValue()); // Criando o set para inserir o UF
