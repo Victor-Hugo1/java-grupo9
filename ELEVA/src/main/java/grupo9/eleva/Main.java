@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,16 +66,16 @@ public class Main {
                     System.out.println("Inserindo: " + dado.getData() + " - " + dado.getUf() + " - " + dado.getRegiao() + " - "
                             + dado.getClasse() + " - " + dado.getConsumo() + " - " + dado.getConsumidores());
 
-                    conexao.update(
-                            "INSERT INTO dados_eleva (data, uf, regiao, classe, consumo, consumidores) VALUES (?, ?, ?, ?, ?, ?)",
-                            java.sql.Date.valueOf(dado.getData()),
-                            dado.getUf(),
-                            dado.getRegiao(),
-                            dado.getClasse(),
-                            dado.getConsumo(),
-                            dado.getConsumidores()
-                    );
-                    idBanco++;
+                int sqlInsert = conexao.update(
+                        "INSERT INTO dados_eleva (data, uf, regiao, classe, consumo, consumidores) VALUES (?, ?, ?, ?, ?, ?)",
+                        Date.valueOf(dado.getData()),
+                        dado.getUf(),
+                        dado.getRegiao(),
+                        dado.getClasse(),
+                        dado.getConsumo(),
+                        dado.getConsumidores()
+                );
+                idBanco++;
                 }
             }
         }
