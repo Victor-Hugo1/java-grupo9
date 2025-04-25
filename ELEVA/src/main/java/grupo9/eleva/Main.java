@@ -48,34 +48,58 @@ public class Main {
 
 
         for (DadosEleva dado : dadosExtraidos) {
-            // Verificação para não inserir duas vezes no banco
-            List<DadosEleva> dadosNoBanco = conexao.query(
-                    "SELECT * FROM dados_eleva WHERE data = ? AND uf = ? AND regiao = ? AND classe = ? AND consumo = ? AND consumidores = ?",
+
+            // Verificação na tabela Consumo de Energia para não inserir duas vezes os dados na tabela
+
+            List<DadosEleva> dadosConsumoEnergia = conexao.query(
+                    "SELECT * FROM consumoEnergia WHERE consumo = ? AND data = ? AND classe = ? AND consumidores = ?",
                     new BeanPropertyRowMapper<>(DadosEleva.class),
-                    java.sql.Date.valueOf(dado.getData()),
-                    dado.getUf(),
-                    dado.getRegiao(),
-                    dado.getClasse(),
                     dado.getConsumo(),
+                    java.sql.Date.valueOf(dado.getData()),
+                    dado.getClasse(),
                     dado.getConsumidores()
             );
-            if (!dadosNoBanco.isEmpty()) {
-                System.out.println("Dado já existe no banco localizado com o ID: " + idBanco);
+
+            // Verificação na tabela Estados para não inserir duas vezes os dados na tabela
+
+            List<DadosEleva> dadosEstados = conexao.query(
+                    "SELECT * FROM estados WHERE uf = ? AND regiao = ?",
+                    new BeanPropertyRowMapper<>(DadosEleva.class),
+                    dado.getUf(),
+                    dado.getRegiao()
+            );
+
+
+            if (!dadosConsumoEnergia.isEmpty()) {
+                System.out.println("Dado já existe na tabela consumo com o ID: " + idBanco);
                 idBanco ++;
-            } else {
-                    System.out.println("Inserindo: " + dado.getData() + " - " + dado.getUf() + " - " + dado.getRegiao() + " - "
-                            + dado.getClasse() + " - " + dado.getConsumo() + " - " + dado.getConsumidores());
+            }
+            else {
+                    System.out.println("Inserindo: " + dado.getConsumo() + " - " + dado.getData() + " - " + dado.getClasse() + " - " + dado.getConsumidores());
 
                 int sqlInsert = conexao.update(
-                        "INSERT INTO dados_eleva (data, uf, regiao, classe, consumo, consumidores) VALUES (?, ?, ?, ?, ?, ?)",
-                        Date.valueOf(dado.getData()),
-                        dado.getUf(),
-                        dado.getRegiao(),
-                        dado.getClasse(),
+                        "INSERT INTO consumoEnergia (consumo, data, classe, consumidores) VALUES (?, ?, ?, ?)",
                         dado.getConsumo(),
+                        Date.valueOf(dado.getData()),
+                        dado.getClasse(),
                         dado.getConsumidores()
                 );
                 idBanco++;
+                }
+
+            if(!dadosEstados.isEmpty()){
+                System.out.println("Dado já existe na tabela com o ID: " + idBanco);
+
+            }
+            else {
+                System.out.println("Inserindo: " + dado.getUf() + " - " + dado.getRegiao());
+
+                int sqlInsert = conexao.update(
+                        "INSERT INTO estados (uf, regiao) VALUES (?, ?)",
+                        dado.getUf(),
+                        dado.getRegiao()
+                );
+
                 }
             }
         }
