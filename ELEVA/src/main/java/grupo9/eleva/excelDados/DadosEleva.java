@@ -1,15 +1,14 @@
-package grupo9.eleva.reader;
+package grupo9.eleva.excelDados;
 
 import java.time.LocalDate;
 
 public class DadosEleva {
-    //Preciso dizer?
+    private Double consumo;
     private LocalDate data;
+    private String classe;
+    private Long consumidores;
     private String uf;
     private String regiao;
-    private String classe;
-    private Double consumo;
-    private Long consumidores;
 
     public DadosEleva() {
     }

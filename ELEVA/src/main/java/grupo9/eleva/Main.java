@@ -1,106 +1,42 @@
 package grupo9.eleva;
 
 import grupo9.eleva.bdpath.ConexaoBD;
-import grupo9.eleva.reader.DadosEleva;
-import grupo9.eleva.reader.LeitorExcel;
-import grupo9.eleva.s3connection.ConnectorS3;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import grupo9.eleva.excelDados.DadosEleva;
+import grupo9.eleva.excelDados.LeitorExcel;
 import org.springframework.jdbc.core.JdbcTemplate;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-
     public static void main(String[] args) throws IOException {
+        try {
+            // 1. Cria a conexão com o banco
+            ConexaoBD conexaoBD = new ConexaoBD();
+            JdbcTemplate jdbcTemplate = conexaoBD.getConnection();
 
-//        S3
-//        S3Client s3Client = new ConnectorS3().getS3Client();
-//        String bucketName = "eleva-s3";
+            // 2. Carrega o arquivo Excel
+            String nomeArquivo = "Dados (Grupo 9).xlsx";
+            Path caminho = Path.of(nomeArquivo);
+            InputStream arquivo = Files.newInputStream(caminho);
 
-        String nomeArquivo = "Dados (Grupo 9).xlsx";
-        // Carregando o arquivo excel
-        Path caminho = Path.of(nomeArquivo);
-        InputStream arquivo = Files.newInputStream(caminho);
+            // 3. Passa a conexão para o LeitorExcel
+            LeitorExcel leitorDados = new LeitorExcel(jdbcTemplate);
+            List<DadosEleva> dadosExtraidos = leitorDados.extrairDados(nomeArquivo, arquivo);
 
-        // Extraindo os livros do arquivo
-        LeitorExcel leitorDados = new LeitorExcel();
-        List<DadosEleva> dadosExtraidos = leitorDados.extrairDados(nomeArquivo, arquivo);
+            // 4. Fecha o arquivo
+            arquivo.close();
 
-        // Fechando o arquivo após a extração
-        arquivo.close();
-
-        System.out.println("Dados extraidos:");
-        for (DadosEleva dadosEleva : dadosExtraidos) {
-            System.out.println(dadosEleva);
-        }
-
-        ConexaoBD dados = new ConexaoBD();
-        JdbcTemplate conexao = dados.getConnection();
-        Integer idBanco = 1;
-
-
-        for (DadosEleva dado : dadosExtraidos) {
-
-            // Verificação na tabela Consumo de Energia para não inserir duas vezes os dados na tabela
-
-            List<DadosEleva> dadosConsumoEnergia = conexao.query(
-                    "SELECT * FROM consumoEnergia WHERE consumo = ? AND data = ? AND classe = ? AND consumidores = ?",
-                    new BeanPropertyRowMapper<>(DadosEleva.class),
-                    dado.getConsumo(),
-                    java.sql.Date.valueOf(dado.getData()),
-                    dado.getClasse(),
-                    dado.getConsumidores()
-            );
-
-            // Verificação na tabela Estados para não inserir duas vezes os dados na tabela
-
-            List<DadosEleva> dadosEstados = conexao.query(
-                    "SELECT * FROM estados WHERE uf = ? AND regiao = ?",
-                    new BeanPropertyRowMapper<>(DadosEleva.class),
-                    dado.getUf(),
-                    dado.getRegiao()
-            );
-
-
-            if (!dadosConsumoEnergia.isEmpty()) {
-                System.out.println("Dado já existe na tabela consumo com o ID: " + idBanco);
-                idBanco ++;
+            System.out.println("Dados extraídos:");
+            for (DadosEleva dadosEleva : dadosExtraidos) {
+                System.out.println(dadosEleva);
             }
-            else {
-                    System.out.println("Inserindo: " + dado.getConsumo() + " - " + dado.getData() + " - " + dado.getClasse() + " - " + dado.getConsumidores());
-
-                int sqlInsert = conexao.update(
-                        "INSERT INTO consumoEnergia (consumo, data, classe, consumidores) VALUES (?, ?, ?, ?)",
-                        dado.getConsumo(),
-                        Date.valueOf(dado.getData()),
-                        dado.getClasse(),
-                        dado.getConsumidores()
-                );
-                idBanco++;
-                }
-
-            if(!dadosEstados.isEmpty()){
-                System.out.println("Dado já existe na tabela com o ID: " + idBanco);
-
-            }
-            else {
-                System.out.println("Inserindo: " + dado.getUf() + " - " + dado.getRegiao());
-
-                int sqlInsert = conexao.update(
-                        "INSERT INTO estados (uf, regiao) VALUES (?, ?)",
-                        dado.getUf(),
-                        dado.getRegiao()
-                );
-
-                }
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro ao processar o arquivo: " + e.getMessage());
         }
     }
+}

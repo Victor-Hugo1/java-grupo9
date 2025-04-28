@@ -14,9 +14,9 @@ public class ConexaoBD {
 
         //Aqui usamos métodos do JDBC para criar o nosso caminho de conexão com o banco
         BasicDataSource basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl("jdbc:mysql://localhost:3306/eleva?useSSL=false&serverTimezone=GMT-3");
+        basicDataSource.setUrl("jdbc:mysql://204.236.198.140:3306/eleva?useSSL=false&serverTimezone=GMT-3");
         basicDataSource.setUsername("root");
-        basicDataSource.setPassword("2808");
+        basicDataSource.setPassword("sptech");
 
         this.dataSource = basicDataSource;
     }
