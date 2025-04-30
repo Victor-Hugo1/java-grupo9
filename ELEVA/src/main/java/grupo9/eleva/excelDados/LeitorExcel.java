@@ -95,7 +95,6 @@ public class LeitorExcel {
         }
     }
 
-
     private LocalDate converterDate(Date data) {
         return data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
