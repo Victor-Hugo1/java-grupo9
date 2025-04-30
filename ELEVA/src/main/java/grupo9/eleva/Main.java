@@ -3,7 +3,10 @@ package grupo9.eleva;
 import grupo9.eleva.bdpath.ConexaoBD;
 import grupo9.eleva.excelDados.DadosEleva;
 import grupo9.eleva.excelDados.LeitorExcel;
+import grupo9.eleva.s3connection.ConnectorS3;
 import org.springframework.jdbc.core.JdbcTemplate;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,21 +17,27 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws IOException {
         try {
-            // 1. Cria a conexão com o banco
+
+            S3Client s3Client = new ConnectorS3().getS3Client();
+            String bucketName = "s3-eleva";
+            String key = "dados-excel/Dados (Grupo 9).xlsx";
+
+            InputStream inputStream = s3Client.getObject(GetObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build());
+
+            // Cria a conexão com o banco
             ConexaoBD conexaoBD = new ConexaoBD();
+
             JdbcTemplate jdbcTemplate = conexaoBD.getConnection();
 
-            // 2. Carrega o arquivo Excel
-            String nomeArquivo = "Dados (Grupo 9).xlsx";
-            Path caminho = Path.of(nomeArquivo);
-            InputStream arquivo = Files.newInputStream(caminho);
-
-            // 3. Passa a conexão para o LeitorExcel
+            // Passa a conexão para o LeitorExcel
             LeitorExcel leitorDados = new LeitorExcel(jdbcTemplate);
-            List<DadosEleva> dadosExtraidos = leitorDados.extrairDados(nomeArquivo, arquivo);
+            List<DadosEleva> dadosExtraidos = leitorDados.extrairDados(key, inputStream);
 
-            // 4. Fecha o arquivo
-            arquivo.close();
+            // Fecha o arquivo
+            inputStream.close();
 
             System.out.println("Dados extraídos:");
             for (DadosEleva dadosEleva : dadosExtraidos) {
