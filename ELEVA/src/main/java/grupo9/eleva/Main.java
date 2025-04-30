@@ -32,8 +32,6 @@ public class Main {
 
             JdbcTemplate jdbcTemplate = conexaoBD.getConnection();
 
-
-
             // Passa a conexão para o LeitorExcel
             LeitorExcel leitorDados = new LeitorExcel(jdbcTemplate);
             List<DadosEleva> dadosExtraidos = leitorDados.extrairDados(key, inputStream);

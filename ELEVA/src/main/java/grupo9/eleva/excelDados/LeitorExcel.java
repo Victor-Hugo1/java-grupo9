@@ -101,7 +101,7 @@ public class LeitorExcel {
 
     public void enviarDadosEleva(List<DadosEleva> dadosEleva) {
 
-        String sql = "INSERT INTO consumoEnergia (consumo, data, classe, consumidores, uf, regiao) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO consumoEnergia (data, classe, consumo, consumidores, uf, regiao) VALUES (?, ?, ?, ?, ?, ?)";
 
         ConexaoBD dados = new ConexaoBD();
         JdbcTemplate conexao = dados.getConnection();
@@ -109,18 +109,20 @@ public class LeitorExcel {
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 DadosEleva dados = dadosEleva.get(i);
-                ps.setDouble(1, dados.getConsumo());
-                ps.setDate(2, java.sql.Date.valueOf(dados.getData()));
-                ps.setString(3, dados.getClasse());
+                ps.setDate(1, java.sql.Date.valueOf(dados.getData()));
+                ps.setString(2, dados.getClasse());
+                ps.setDouble(3, dados.getConsumo());
                 ps.setLong(4, dados.getConsumidores());
                 ps.setString(5, dados.getUf());
                 ps.setString(6, dados.getRegiao());
 
+
+                //TODO ANALISAR POSSIBILIDADE DE REMOÇÃO
                 System.out.printf(
-                        "Inserindo dados: [Consumo: %.2f | Data: %s | Classe: %s | Consumidores: %d | UF: %s | Região: %s]%n",
-                        dados.getConsumo(),
+                        "Inserindo dados: [Data: %s | Classe: %s | Consumo: %.2f | Consumidores: %d | UF: %s | Região: %s]%n",
                         dados.getData(),
                         dados.getClasse(),
+                        dados.getConsumo(),
                         dados.getConsumidores(),
                         dados.getUf(),
                         dados.getRegiao()

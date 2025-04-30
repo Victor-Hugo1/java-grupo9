@@ -1,5 +1,6 @@
 package grupo9.eleva.s3connection;
 
+import grupo9.eleva.ConfigurationVariable;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
@@ -12,9 +13,9 @@ public class ConnectorS3 {
     private final AwsCredentialsProvider credentialsProvider;
 
     public ConnectorS3() {
-        String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
-        String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
-        String sessionToken = System.getenv("AWS_SESSION_TOKEN");
+        String accessKey = ConfigurationVariable.get("AWS_ACCESS_KEY_ID");
+        String secretKey = ConfigurationVariable.get("AWS_SECRET_ACCESS_KEY");
+        String sessionToken = ConfigurationVariable.get("AWS_SESSION_TOKEN");
 
         if (sessionToken != null && !sessionToken.isEmpty()) {
             AwsSessionCredentials sessionCredentials = AwsSessionCredentials.create(
