@@ -6,15 +6,17 @@ import grupo9.eleva.excelDados.LeitorExcel;
 import grupo9.eleva.s3connection.ConnectorS3;
 import org.springframework.jdbc.core.JdbcTemplate;
 import software.amazon.awssdk.services.s3.S3Client;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 public class Main {
+    private static final Logger logger = LogManager.getLogger(Main.class);
+
     public static void main(String[] args) throws IOException {
         try {
 
@@ -39,13 +41,13 @@ public class Main {
             // Fecha o arquivo
             inputStream.close();
 
-            System.out.println("Dados extraídos:");
+            logger.info("Dado extraído com sucesso");
             for (DadosEleva dadosEleva : dadosExtraidos) {
                 System.out.println(dadosEleva);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Erro ao processar o arquivo: " + e.getMessage());
+            logger.error("Erro ao processar o arquivo: " + e.getMessage());
         }
     }
 }
