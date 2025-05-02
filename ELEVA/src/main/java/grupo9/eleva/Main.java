@@ -16,13 +16,23 @@ import java.util.List;
 
 public class Main {
     private static final Logger logger = LogManager.getLogger(Main.class);
+    private static Integer countSucessDados = 0;
+
+    public static Integer getCountSucessDados() {
+        return countSucessDados;
+    }
+
+    public static void setCountSucessDados(Integer countSucessDados) {
+        countSucessDados = countSucessDados;
+    }
 
     public static void main(String[] args) throws IOException {
         try {
-
+            Integer contadorDados = getCountSucessDados();
             S3Client s3Client = new ConnectorS3().getS3Client();
             String bucketName = "s3-eleva";
             String key = "dados-excel/Dados (Grupo 9).xlsx";
+            String nomeArquivo = "Dados(Grupo 9).xlsx";
 
             InputStream inputStream = s3Client.getObject(GetObjectRequest.builder()
                     .bucket(bucketName)
@@ -35,19 +45,30 @@ public class Main {
             JdbcTemplate jdbcTemplate = conexaoBD.getConnection();
 
             // Passa a conexão para o LeitorExcel
+            logger.info("Iniciando leitura e inserção de dados do arquivo: %s".formatted(nomeArquivo));
             LeitorExcel leitorDados = new LeitorExcel(jdbcTemplate);
             List<DadosEleva> dadosExtraidos = leitorDados.extrairDados(key, inputStream);
 
             // Fecha o arquivo
             inputStream.close();
 
-            logger.info("Dado extraído com sucesso");
+            logger.info("Leitura completa de dados do arquivo: %s".formatted(nomeArquivo));
             for (DadosEleva dadosEleva : dadosExtraidos) {
-                System.out.println(dadosEleva);
+                logger.info(dadosEleva);
+                contadorDados++;
             }
+
+            setCountSucessDados(contadorDados);
+
+            //Logs mostrando quantos dados foram inseridos com sucesso
+            logger.info("Foram inseridos: %d".formatted(getCountSucessDados()));
+
+
         } catch (Exception e) {
+
             e.printStackTrace();
-            logger.error("Erro ao processar o arquivo: " + e.getMessage());
+            System.out.println(e.getMessage());
+            logger.error("Erro ao processar arquivo");
         }
     }
 }

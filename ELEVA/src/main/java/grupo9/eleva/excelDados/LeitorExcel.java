@@ -9,7 +9,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import grupo9.eleva.bdpath.ConexaoBD;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +18,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class LeitorExcel {
@@ -58,7 +56,7 @@ public class LeitorExcel {
                         logger.info("Coluna " + i + ": " + coluna);
                     }
 
-                    System.out.println("--------------------");
+                    System.out.println("------------------------------------------------------------");
                     continue;
                 }
 
@@ -88,6 +86,7 @@ public class LeitorExcel {
             // Fechando o workbook após a leitura
             workbook.close();
             logger.info("\nLeitura do arquivo finalizada\n");
+            logger.info("Total de dados lidos com sucesso: %d".formatted());
 
             insercaoDados(dadosExtraidos);
             return dadosExtraidos;
