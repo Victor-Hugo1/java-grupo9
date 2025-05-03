@@ -1,5 +1,7 @@
 package grupo9.eleva;
 
+import grupo9.eleva.Logs.LogsCarga;
+import grupo9.eleva.Logs.LogsProcessor;
 import grupo9.eleva.bdpath.ConexaoBD;
 import grupo9.eleva.excelDados.DadosEleva;
 import grupo9.eleva.excelDados.LeitorExcel;
@@ -12,23 +14,27 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Main {
+
+    private static final ConexaoBD conexaoBD = new ConexaoBD();
     private static final Logger logger = LogManager.getLogger(Main.class);
-    private static Integer countSucessDados = 0;
+    private static final JdbcTemplate jdbcTemplate = conexaoBD.getConnection();
+    private static final LogsProcessor logs = new LogsProcessor(jdbcTemplate);
 
-    public static Integer getCountSucessDados() {
-        return countSucessDados;
-    }
-
-    public static void setCountSucessDados(Integer countSucessDados) {
-        countSucessDados = countSucessDados;
-    }
 
     public static void main(String[] args) throws IOException {
         try {
-            Integer contadorDados = getCountSucessDados();
+
+            LocalDateTime inicio = LocalDateTime.now();
+            Integer totalDeRegistros = 0;
+            Integer logsSucesso = 0;
+            Integer logsErro = 0;
+
+
+
             S3Client s3Client = new ConnectorS3().getS3Client();
             String bucketName = "s3-eleva";
             String key = "dados-excel/Dados (Grupo 9).xlsx";
@@ -40,9 +46,9 @@ public class Main {
                     .build());
 
             // Cria a conexão com o banco
-            ConexaoBD conexaoBD = new ConexaoBD();
 
-            JdbcTemplate jdbcTemplate = conexaoBD.getConnection();
+
+
 
             // Passa a conexão para o LeitorExcel
             logger.info("Iniciando leitura e inserção de dados do arquivo: %s".formatted(nomeArquivo));
@@ -55,17 +61,21 @@ public class Main {
             logger.info("Leitura completa de dados do arquivo: %s".formatted(nomeArquivo));
             for (DadosEleva dadosEleva : dadosExtraidos) {
                 logger.info(dadosEleva);
-                contadorDados++;
+                totalDeRegistros++;
+                logsSucesso = totalDeRegistros;
             }
 
-            setCountSucessDados(contadorDados);
 
-            //Logs mostrando quantos dados foram inseridos com sucesso
-            logger.info("Foram inseridos: %d".formatted(getCountSucessDados()));
-
+            logs.registrarLog(
+                    nomeArquivo,
+                    totalDeRegistros,
+                    logsSucesso,
+                    logsErro,
+                    "Arquivo processado",
+                    inicio
+            );
 
         } catch (Exception e) {
-
             e.printStackTrace();
             System.out.println(e.getMessage());
             logger.error("Erro ao processar arquivo");

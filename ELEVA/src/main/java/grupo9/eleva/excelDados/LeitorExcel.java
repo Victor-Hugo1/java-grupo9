@@ -86,7 +86,6 @@ public class LeitorExcel {
             // Fechando o workbook após a leitura
             workbook.close();
             logger.info("\nLeitura do arquivo finalizada\n");
-            logger.info("Total de dados lidos com sucesso: %d".formatted());
 
             insercaoDados(dadosExtraidos);
             return dadosExtraidos;
@@ -103,7 +102,7 @@ public class LeitorExcel {
 
     public void enviarDadosEleva(List<DadosEleva> dadosEleva) {
 
-        String sql = "INSERT INTO consumoEnergia (data, classe, consumo, consumidores, uf, regiao) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO consumo_energia (data, classe, consumo, consumidores, uf, regiao) VALUES (?, ?, ?, ?, ?, ?)";
 
         ConexaoBD dados = new ConexaoBD();
         JdbcTemplate conexao = dados.getConnection();
