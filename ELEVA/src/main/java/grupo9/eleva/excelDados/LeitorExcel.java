@@ -9,19 +9,20 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import grupo9.eleva.bdpath.ConexaoBD;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class LeitorExcel {
 
+    private static final Logger logger = LogManager.getLogger(LeitorExcel.class);
     private final JdbcTemplate jdbcTemplate;
     public LeitorExcel(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -30,7 +31,7 @@ public class LeitorExcel {
     public List<DadosEleva> extrairDados(String nomeArquivo, InputStream arquivo) {
 
         try {
-            System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
+            logger.info("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 
             Workbook workbook; // Criando um Workbook(arquivo)
             //Workbook é um leitor de arquivo, ele representa um arquivo inteiro da planilha do Excel
@@ -48,19 +49,19 @@ public class LeitorExcel {
             for (Row row : sheet) { // Row são as linhas, então aqui ele está lendo cada linha da folha
 
                 if (row.getRowNum() == 0) {
-                    System.out.println("\nLendo cabeçalho");
+                    logger.info("\nLendo cabeçalho");
 
                     for (int i = 0; i < 6; i++) {
                         String coluna = row.getCell(i).getStringCellValue(); // aqui pegamos as colunas
-                        System.out.println("Coluna " + i + ": " + coluna);
+                        logger.info("Coluna " + i + ": " + coluna);
                     }
 
-                    System.out.println("--------------------");
+                    System.out.println("------------------------------------------------------------");
                     continue;
                 }
 
                 // Aqui extraímos os valores das células para inserir uma a uma nos atributos criados na classe DadosEleva
-                System.out.println("Lendo linha " + row.getRowNum());
+                logger.info("Lendo linha " + row.getRowNum());
 
                 DadosEleva dadosEleva = new DadosEleva(); // Criando o objeto
                 dadosEleva.setData(converterDate(row.getCell(0).getDateCellValue())); // Criando o set para inserir uma data
@@ -84,7 +85,7 @@ public class LeitorExcel {
 
             // Fechando o workbook após a leitura
             workbook.close();
-            System.out.println("\nLeitura do arquivo finalizada\n");
+            logger.info("\nLeitura do arquivo finalizada\n");
 
             insercaoDados(dadosExtraidos);
             return dadosExtraidos;
@@ -101,7 +102,7 @@ public class LeitorExcel {
 
     public void enviarDadosEleva(List<DadosEleva> dadosEleva) {
 
-        String sql = "INSERT INTO consumoEnergia (data, classe, consumo, consumidores, uf, regiao) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO consumo_energia (data, classe, consumo, consumidores, uf, regiao) VALUES (?, ?, ?, ?, ?, ?)";
 
         ConexaoBD dados = new ConexaoBD();
         JdbcTemplate conexao = dados.getConnection();
