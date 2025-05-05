@@ -1,6 +1,5 @@
 package grupo9.eleva;
 
-import grupo9.eleva.Logs.LogsCarga;
 import grupo9.eleva.Logs.LogsProcessor;
 import grupo9.eleva.bdpath.ConexaoBD;
 import grupo9.eleva.excelDados.DadosEleva;
