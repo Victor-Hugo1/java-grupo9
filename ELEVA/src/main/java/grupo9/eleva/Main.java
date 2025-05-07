@@ -35,7 +35,7 @@ public class Main {
 
 
             S3Client s3Client = new ConnectorS3().getS3Client();
-            String bucketName = "s3-eleva";
+            String bucketName = "eleva-s3";
             String key = "dados-excel/Dados (Grupo 9).xlsx";
             String nomeArquivo = "Dados(Grupo 9).xlsx";
 
