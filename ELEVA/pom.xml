@@ -38,6 +38,12 @@
       <artifactId>log4j-core</artifactId>
       <version>2.20.0</version>
     </dependency>
+<!-- S3 CONNECTION -->
+<dependency>
+    <groupId>com.amazonaws</groupId>
+    <artifactId>aws-java-sdk-core</artifactId>
+    <version>1.12.538</version>
+</dependency>
 
     <!-- JDBC para conexão com o banco de dados -->
     <dependency>
