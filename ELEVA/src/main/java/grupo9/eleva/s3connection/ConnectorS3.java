@@ -13,9 +13,9 @@ public class ConnectorS3 {
     private final AwsCredentialsProvider credentialsProvider;
 
     public ConnectorS3() {
-        String accessKey = ConfigurationVariable.get("AWS_ACCESS_KEY_ID");
-        String secretKey = ConfigurationVariable.get("AWS_SECRET_ACCESS_KEY");
-        String sessionToken = ConfigurationVariable.get("AWS_SESSION_TOKEN");
+        String accessKey = ConfigurationVariable.get("aws_access_key_id");
+        String secretKey = ConfigurationVariable.get("aws_secret_access_key");
+        String sessionToken = ConfigurationVariable.get("aws_session_token");
 
         if (sessionToken != null && !sessionToken.isEmpty()) {
             AwsSessionCredentials sessionCredentials = AwsSessionCredentials.create(
