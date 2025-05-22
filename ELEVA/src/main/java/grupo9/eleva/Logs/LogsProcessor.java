@@ -1,6 +1,5 @@
-package grupo9.eleva.Logs;
+package grupo9.eleva.logs;
 
-import grupo9.eleva.Main;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;

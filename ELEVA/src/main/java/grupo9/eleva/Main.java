@@ -1,6 +1,6 @@
 package grupo9.eleva;
 
-import grupo9.eleva.Logs.LogsProcessor;
+import grupo9.eleva.logs.LogsProcessor;
 import grupo9.eleva.bdpath.ConexaoBD;
 import grupo9.eleva.excelDados.DadosEleva;
 import grupo9.eleva.excelDados.LeitorExcel;
@@ -44,12 +44,7 @@ public class Main {
                     .key(key)
                     .build());
 
-            // Cria a conexão com o banco
 
-
-
-
-            // Passa a conexão para o LeitorExcel
             logger.info("Iniciando leitura e inserção de dados do arquivo: %s".formatted(nomeArquivo));
             LeitorExcel leitorDados = new LeitorExcel(jdbcTemplate);
             List<DadosEleva> dadosExtraidos = leitorDados.extrairDados(key, inputStream);

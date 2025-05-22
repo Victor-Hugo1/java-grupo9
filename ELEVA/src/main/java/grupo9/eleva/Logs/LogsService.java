@@ -1,4 +1,4 @@
-package grupo9.eleva.Logs;
+package grupo9.eleva.logs;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class LogsService {
@@ -13,7 +13,8 @@ public class LogsService {
             String sql = "INSERT INTO logs_service (nomeArquivo, inicio, fim, logs_registrados, erros, sucesso, mensagem) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-            jdbcTemplate.update(sql,
+            jdbcTemplate.update(
+                    sql,
                     log.getNomeArquivo(),
                     log.getInicioLog(),
                     log.getFimLog(),

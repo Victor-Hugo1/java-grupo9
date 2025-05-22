@@ -1,6 +1,5 @@
-package grupo9.eleva.Logs;
+package grupo9.eleva.logs;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class LogsCarga {
