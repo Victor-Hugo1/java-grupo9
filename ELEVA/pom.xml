@@ -21,6 +21,8 @@
       <artifactId>poi</artifactId>
       <version>5.3.0</version>
     </dependency>
+
+
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
@@ -33,17 +35,20 @@
       <artifactId>log4j-api</artifactId>
       <version>2.20.0</version>
     </dependency>
+
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
       <version>2.20.0</version>
     </dependency>
+
+
 <!-- S3 CONNECTION -->
-<dependency>
-    <groupId>com.amazonaws</groupId>
-    <artifactId>aws-java-sdk-core</artifactId>
-    <version>1.12.538</version>
-</dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-core</artifactId>
+      <version>1.12.538</version>
+    </dependency>
 
     <!-- JDBC para conexão com o banco de dados -->
     <dependency>
@@ -51,6 +56,7 @@
       <artifactId>spring-jdbc</artifactId>
       <version>6.1.11</version>
     </dependency>
+
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-dbcp2</artifactId>
@@ -70,6 +76,7 @@
       <artifactId>mysql-connector-j</artifactId>
       <version>8.0.33</version>
     </dependency>
+
   </dependencies>
 
   <build>

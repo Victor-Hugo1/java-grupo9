@@ -1,4 +1,4 @@
-package grupo9.eleva.logs;
+package grupo9.eleva.Logs;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class LogsService {

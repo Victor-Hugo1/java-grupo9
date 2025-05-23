@@ -1,4 +1,4 @@
-package grupo9.eleva.logs;
+package grupo9.eleva.Logs;
 
 import java.time.LocalDateTime;
 
