@@ -31,7 +31,7 @@ public class LeitorExcel {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<DadosEleva> extrairDados(String nomeArquivo, InputStream arquivo) {
+    public List<Registro> extrairDados(String nomeArquivo, InputStream arquivo) {
 
         try {
             logger.info("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
@@ -45,7 +45,7 @@ public class LeitorExcel {
             }
 
             Sheet sheet = workbook.getSheetAt(0);
-            List<DadosEleva> dadosExtraidos = new ArrayList<>();
+            List<Registro> dadosExtraidos = new ArrayList<>();
 
             for (Row row : sheet) {
 
@@ -63,20 +63,20 @@ public class LeitorExcel {
 
                 logger.info("Lendo linha " + row.getRowNum());
 
-                DadosEleva dadosEleva = new DadosEleva();
-                dadosEleva.setData(converterDate(row.getCell(0).getDateCellValue()));
-                dadosEleva.setUf(row.getCell(1).getStringCellValue());
-                dadosEleva.setRegiao(row.getCell(2).getStringCellValue());
-                dadosEleva.setClasse(row.getCell(3).getStringCellValue());
+                Registro registro = new Registro();
+                registro.setData(converterDate(row.getCell(0).getDateCellValue()));
+                registro.setUf(row.getCell(1).getStringCellValue());
+                registro.setRegiao(row.getCell(2).getStringCellValue());
+                registro.setClasse(row.getCell(3).getStringCellValue());
 
                 Integer consumoFormatado = (int) row.getCell(4).getNumericCellValue();
-                dadosEleva.setConsumo((double) consumoFormatado);
+                registro.setConsumo((double) consumoFormatado);
 
                 Integer consumidorFormatado = (int) row.getCell(5).getNumericCellValue();
-                dadosEleva.setConsumidores((long) consumidorFormatado);
+                registro.setConsumidores((long) consumidorFormatado);
 
 
-                dadosExtraidos.add(dadosEleva);
+                dadosExtraidos.add(registro);
             }
 
 
@@ -92,13 +92,13 @@ public class LeitorExcel {
         }
     }
 
-    public void enviarDadosEleva(List<DadosEleva> dadosEleva) {
+    public void enviarDadosEleva(List<Registro> registro) {
 
         String sql = "INSERT INTO consumo_energia (data, classe, consumo, consumidores, uf, regiao) VALUES (?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                DadosEleva dados = dadosEleva.get(i);
+                Registro dados = registro.get(i);
                 ps.setDate(1, java.sql.Date.valueOf(dados.getData()));
                 ps.setString(2, dados.getClasse());
                 ps.setDouble(3, dados.getConsumo());
@@ -120,17 +120,17 @@ public class LeitorExcel {
             }
 
             public int getBatchSize() {
-                return dadosEleva.size();
+                return registro.size();
             }
         });
     }
 
 
-    public void insercaoDados(List<DadosEleva> dadosElevaList){
+    public void insercaoDados(List<Registro> registroList){
         final int BATCH_SIZE = 500;
-        for (int i = 0; i < dadosElevaList.size(); i += BATCH_SIZE) {
-            int end = Math.min(i + BATCH_SIZE, dadosElevaList.size());
-            List<DadosEleva> subList = dadosElevaList.subList(i, end);
+        for (int i = 0; i < registroList.size(); i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, registroList.size());
+            List<Registro> subList = registroList.subList(i, end);
             enviarDadosEleva(subList);
         }
     }
