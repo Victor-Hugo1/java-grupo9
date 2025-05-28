@@ -1,4 +1,4 @@
-package grupo9.eleva.excelDados;
+package grupo9.eleva.etl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +23,10 @@ public class LeitorExcel {
 
     private static final Logger logger = LogManager.getLogger(LeitorExcel.class);
     private final JdbcTemplate jdbcTemplate;
+    private LocalDate converterDate(Date data) {
+        return data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
     public LeitorExcel(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -86,10 +90,6 @@ public class LeitorExcel {
 
             throw new RuntimeException(e);
         }
-    }
-
-    private LocalDate converterDate(Date data) {
-        return data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
     public void enviarDadosEleva(List<DadosEleva> dadosEleva) {

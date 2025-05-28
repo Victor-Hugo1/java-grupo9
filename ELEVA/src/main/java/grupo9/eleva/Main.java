@@ -1,9 +1,9 @@
 package grupo9.eleva;
 
 import grupo9.eleva.logs.LogsProcessor;
-import grupo9.eleva.bdpath.ConexaoBD;
-import grupo9.eleva.excelDados.DadosEleva;
-import grupo9.eleva.excelDados.LeitorExcel;
+import grupo9.eleva.sqlconnection.ConexaoBD;
+import grupo9.eleva.etl.DadosEleva;
+import grupo9.eleva.etl.LeitorExcel;
 import grupo9.eleva.s3connection.ConnectorS3;
 import org.springframework.jdbc.core.JdbcTemplate;
 import software.amazon.awssdk.services.s3.S3Client;
