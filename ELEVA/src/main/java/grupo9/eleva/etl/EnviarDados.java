@@ -14,7 +14,7 @@ public class EnviarDados {
 
     public void enviarDadosConsumo(List<Registro> registro) {
 
-        String sql = "INSERT INTO consumo_energia (data, classe, consumo, consumidores, uf, regiao) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO energia_historico (dataHora, classe, consumo, consumidores, uf, regiao) VALUES (?, ?, ?, ?, ?, ?)";
 
         ExtracaoDados.getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
             public void setValues(PreparedStatement ps, int i) throws SQLException {

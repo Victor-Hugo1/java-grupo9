@@ -21,7 +21,7 @@ public class TransformarDados {
     }
 
     public void transformarDados(List<Registro> registrosExtraidos){
-        final int BATCH_SIZE = 500;
+        final int BATCH_SIZE = 100;
         for (int i = 0; i < registrosExtraidos.size(); i += BATCH_SIZE) {
             int end = Math.min(i + BATCH_SIZE, registrosExtraidos.size());
             List<Registro> subList = registrosExtraidos.subList(i, end);

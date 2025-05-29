@@ -86,7 +86,7 @@ public class ExtracaoDados {
                 registroDados.setConsumidores((long) consumidorFormatado);
 
                 Log log = new Log(LocalDateTime.now(), Origem.EXTRACAO, Categoria.INFO, "Lendo linha: %d".formatted(row.getRowNum()));
-
+                System.out.println(log);
                 logs.add(log);
                 registros.add(registroDados);
 
