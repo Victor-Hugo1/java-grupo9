@@ -8,12 +8,13 @@ import javax.sql.DataSource;
 public class ConexaoMySQL {
 
     private final DataSource conexaoBD;
-    private BasicDataSource configuracaoBD = new BasicDataSource();
+
 
     public ConexaoMySQL() {
-        configuracaoBD.setUrl("jdbc:mysql://mysql:3306/eleva?useSSL=false&serverTimezone=GMT-3&allowPublicKeyRetrieval=true");
+        BasicDataSource configuracaoBD = new BasicDataSource();
+        configuracaoBD.setUrl("jdbc:mysql://localhost:3306/eleva?useSSL=false&serverTimezone=GMT-3&allowPublicKeyRetrieval=true");
         configuracaoBD.setUsername("root");
-        configuracaoBD.setPassword("sptech");
+        configuracaoBD.setPassword("2808");
 
         this.conexaoBD = configuracaoBD;
     }

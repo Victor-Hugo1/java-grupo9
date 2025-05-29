@@ -1,6 +1,8 @@
 package grupo9.eleva.etl;
 
+import grupo9.eleva.logs.Categoria;
 import grupo9.eleva.logs.Log;
+import grupo9.eleva.logs.Origem;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -11,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,12 +21,11 @@ import java.util.List;
 
 public class ExtracaoDados {
     private List<Registro> registros = new ArrayList<>();
-    private JdbcTemplate jdbcTemplate;
-    private static List<Log> logs;
+    private static JdbcTemplate jdbcTemplate;
+    private static List<Log> logs = new ArrayList<>();
 
     public ExtracaoDados(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.logs = new ArrayList<>();
     }
 
     public List<Registro> getRegistros() {
@@ -34,10 +36,9 @@ public class ExtracaoDados {
         this.registros = registros;
     }
 
-    public JdbcTemplate getJdbcTemplate() {
+    public static JdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;
     }
-
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -74,17 +75,21 @@ public class ExtracaoDados {
                     }
                     continue;
                 }
-                Registro registro = new Registro();
-                registro.setData(conversorData(row.getCell(0).getDateCellValue()));
-                registro.setUf(row.getCell(1).getStringCellValue());
-                registro.setRegiao(row.getCell(2).getStringCellValue());
-                registro.setClasse(row.getCell(3).getStringCellValue());
+                Registro registroDados = new Registro();
+                registroDados.setData(conversorData(row.getCell(0).getDateCellValue()));
+                registroDados.setUf(row.getCell(1).getStringCellValue());
+                registroDados.setRegiao(row.getCell(2).getStringCellValue());
+                registroDados.setClasse(row.getCell(3).getStringCellValue());
                 Integer consumoFormatado = (int) row.getCell(4).getNumericCellValue();
-                registro.setConsumo((double) consumoFormatado);
+                registroDados.setConsumo((double) consumoFormatado);
                 Integer consumidorFormatado = (int) row.getCell(5).getNumericCellValue();
-                registro.setConsumidores((long) consumidorFormatado);
+                registroDados.setConsumidores((long) consumidorFormatado);
 
-                registros.add(registro);
+                Log log = new Log(LocalDateTime.now(), Origem.EXTRACAO, Categoria.INFO, "Lendo linha: %d".formatted(row.getRowNum()));
+
+                logs.add(log);
+                registros.add(registroDados);
+
             }
             return registros;
 

@@ -6,17 +6,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransformarDados {
-    private List <Log> logs = new ArrayList<>(ExtracaoDados.getLogs());
+    private static List <Log> logs =  new ArrayList<>(ExtracaoDados.getLogs());
+    private EnviarDados enviarDados = new EnviarDados();
 
-    public List<ExtracaoDados> transformarDados(List<ExtracaoDados> registrosExtraidos){
-        List<ExtracaoDados> loteLista = new ArrayList<>();
+    public TransformarDados() {
+    }
+
+    public static List<Log> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(List<Log> logs) {
+        this.logs = logs;
+    }
+
+    public void transformarDados(List<Registro> registrosExtraidos){
         final int BATCH_SIZE = 500;
         for (int i = 0; i < registrosExtraidos.size(); i += BATCH_SIZE) {
             int end = Math.min(i + BATCH_SIZE, registrosExtraidos.size());
-            List<ExtracaoDados> subList = registrosExtraidos.subList(i, end);
-            loteLista.add(subList);
+            List<Registro> subList = registrosExtraidos.subList(i, end);
+            enviarDados.enviarDadosConsumo(subList);
         }
-        return(subList);
 
     }
 }
