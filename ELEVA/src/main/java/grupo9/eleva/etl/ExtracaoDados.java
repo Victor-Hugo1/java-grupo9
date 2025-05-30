@@ -3,6 +3,7 @@ package grupo9.eleva.etl;
 import grupo9.eleva.logs.Categoria;
 import grupo9.eleva.logs.Log;
 import grupo9.eleva.logs.Origem;
+import grupo9.eleva.s3.ConexaoS3;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -21,8 +22,8 @@ import java.util.List;
 
 public class ExtracaoDados {
     private List<Registro> registros = new ArrayList<>();
-    private static JdbcTemplate jdbcTemplate;
-    private static List<Log> logs = new ArrayList<>();
+    private JdbcTemplate jdbcTemplate;
+    private static List<Log> logs = new ArrayList<>(ConexaoS3.getLogList());
 
     public ExtracaoDados(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -36,7 +37,7 @@ public class ExtracaoDados {
         this.registros = registros;
     }
 
-    public static JdbcTemplate getJdbcTemplate() {
+    public JdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;
     }
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -85,8 +86,11 @@ public class ExtracaoDados {
                 Integer consumidorFormatado = (int) row.getCell(5).getNumericCellValue();
                 registroDados.setConsumidores((long) consumidorFormatado);
 
-                Log log = new Log(LocalDateTime.now(), Origem.EXTRACAO, Categoria.INFO, "Lendo linha: %d".formatted(row.getRowNum()));
-                System.out.println(log);
+
+
+                Log log = new Log(LocalDateTime.now(), Origem.EXTRACAO, Categoria.INFO, "Lendo linha: " + row.getRowNum());
+                System.out.println("Extraindo dado do arquivo: " + log);
+
                 logs.add(log);
                 registros.add(registroDados);
 
