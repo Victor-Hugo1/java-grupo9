@@ -13,9 +13,9 @@ public class ConexaoMySQL {
 
     public ConexaoMySQL() {
         BasicDataSource configuracaoBD = new BasicDataSource();
-        configuracaoBD.setUrl("jdbc:mysql://localhost:3306/eleva?useSSL=false&serverTimezone=GMT-3&allowPublicKeyRetrieval=true");
+        configuracaoBD.setUrl("jdbc:mysql://mysql:3306/eleva?useSSL=false&serverTimezone=GMT-3&allowPublicKeyRetrieval=true");
         configuracaoBD.setUsername("root");
-        configuracaoBD.setPassword("2808");
+        configuracaoBD.setPassword("sptech");
         this.conexaoBD = configuracaoBD;
     }
 

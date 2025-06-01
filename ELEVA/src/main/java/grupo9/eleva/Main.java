@@ -31,30 +31,28 @@ public class Main {
         try {
 
             // Processo de conexao S3
-//            S3Client s3Client = new ConexaoS3().getS3Client();
-//            ConexaoS3 conexaoS3 = new ConexaoS3();
-//            Log log = new Log(LocalDateTime.now(), Origem.CONEXAO_S3, Categoria.INFO, "Conexão realizada com sucesso");
-//            System.out.println("Conexão com bucket S3 " + log);
-//
-//            conexaoS3.adicionarLog(log);
-//
-//            String bucketName = "eleva-s3";
-//            String key = "dados-excel/Dados (Grupo 9).xlsx";
-              String nomeArquivo = "src/main/Dados(Grupo09).xlsx";
+            S3Client s3Client = new ConexaoS3().getS3Client();
+            ConexaoS3 conexaoS3 = new ConexaoS3();
+            Log log = new Log(LocalDateTime.now(), Origem.CONEXAO_S3, Categoria.INFO, "Conexão realizada com sucesso");
+            System.out.println("Conexão com bucket S3 " + log);
 
-//            InputStream inputStream = s3Client.getObject(GetObjectRequest.builder()
-//                    .bucket(bucketName)
-//                    .key(key)
-//                    .build());
-            // Conexao S3 já realizada
-            // CONEXAO COM ARQUIVO LOCAL
-            // Carregando o arquivo excel
+            conexaoS3.adicionarLog(log);
+
+            String bucketName = "eleva-s3";
+            String key = "dados-excel/Dados(Grupo09).xlsx";
+            String nomeArquivo = "Dados(Grupo09).xlsx";
+
+            InputStream inputStream = s3Client.getObject(GetObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build());
 
             Path caminho = Path.of(nomeArquivo);
+            Files.copy(inputStream, caminho);
+
             InputStream arquivo = Files.newInputStream(caminho);
 
             ExtracaoDados extracaoDados = new ExtracaoDados(jdbcTemplate);
-            Log log = new Log(LocalDateTime.now(), Origem.CONEXAO_MYSQL , Categoria.INFO, "Conexão realizada com sucesso");
 
             System.out.println("Realizando a conexão com o MYSQL: " + log );
 
