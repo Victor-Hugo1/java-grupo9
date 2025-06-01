@@ -7,9 +7,7 @@ import grupo9.eleva.logs.Categoria;
 import grupo9.eleva.logs.Log;
 import grupo9.eleva.logs.Origem;
 import grupo9.eleva.mysql.ConexaoMySQL;
-import grupo9.eleva.etl.Registro;
 import grupo9.eleva.s3.ConexaoS3;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTRotY;
 import org.springframework.jdbc.core.JdbcTemplate;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -19,7 +17,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class Main {
 
@@ -31,47 +28,40 @@ public class Main {
         try {
 
             // Processo de conexao S3
-            S3Client s3Client = new ConexaoS3().getS3Client();
-            ConexaoS3 conexaoS3 = new ConexaoS3();
+            S3Client s3Client = new ConexaoS3().getS3Client(); // Commita essa linha para teste local
+            ConexaoS3 conexaoS3 = new ConexaoS3(); // Commita essa linha para teste local
             Log log = new Log(LocalDateTime.now(), Origem.CONEXAO_S3, Categoria.INFO, "Conexão realizada com sucesso");
-            System.out.println("Conexão com bucket S3 " + log);
+            System.out.println("Conexão com bucket S3 " + log); // Commita essa linha para teste local
 
-            conexaoS3.adicionarLog(log);
+           conexaoS3.adicionarLog(log);// Commita essa linha para teste local
 
-            String bucketName = "eleva-s3";
-            String key = "dados-excel/Dados(Grupo09).xlsx";
-            String nomeArquivo = "Dados(Grupo09).xlsx";
+           String bucketName = "eleva-s3";// Commita essa linha para teste local
+           String key = "dados-excel/Dados(Grupo09).xlsx";// Commita essa linha para teste local
+           String nomeArquivo = "Dados(Grupo09).xlsx";
 
-            InputStream inputStream = s3Client.getObject(GetObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .build());
+           InputStream inputStream = s3Client.getObject(GetObjectRequest.builder() // Commita essa linha para teste local
+                   .bucket(bucketName) // Commita essa linha para teste local
+                   .key(key) // Commita essa linha para teste local
+                   .build()); // Commita essa linha para teste local
 
             Path caminho = Path.of(nomeArquivo);
-            Files.copy(inputStream, caminho);
+            Files.copy(inputStream, caminho); // Commita essa linha para teste local
 
             InputStream arquivo = Files.newInputStream(caminho);
 
             ExtracaoDados extracaoDados = new ExtracaoDados(jdbcTemplate);
-
+            TransformarDados dataTransform = new TransformarDados(jdbcTemplate);
             System.out.println("Realizando a conexão com o MYSQL: " + log );
 
-            List<Registro> registrosExtraidos = extracaoDados.extrairDados(nomeArquivo, arquivo);
-
-            TransformarDados dataTransform = new TransformarDados(jdbcTemplate);
-
-            dataTransform.transformarDados(registrosExtraidos);
+            extracaoDados.extrairDadosEmBatch(nomeArquivo, arquivo, batch -> {
+                dataTransform.transformarDados(batch); // transforma e envia o batch para o banco
+            });
 
             // Fecha o arquivo
             arquivo.close();
 
             EnviarDados enviarDados = new EnviarDados(jdbcTemplate);
             enviarDados.enviarLogs();
-//
-//            logger.info("Leitura completa de dados do arquivo: %s".formatted(nomeArquivo));
-//            for (Registro registro : registrosExtraidos) {
-//                logger.info(registro);
-//            }
 
         } catch (Exception e) {
             e.printStackTrace();

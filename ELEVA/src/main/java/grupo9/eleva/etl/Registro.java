@@ -1,11 +1,12 @@
 package grupo9.eleva.etl;
 
+
 import java.time.LocalDate;
 
 public class Registro {
     private LocalDate data;
     private String classe;
-    private Double consumo;
+    private Integer consumo;
     private Long consumidores;
     private String uf;
     private String regiao;
@@ -13,7 +14,7 @@ public class Registro {
     public Registro() {
     }
 
-    public Registro(LocalDate data , String classe, Double consumo, Long consumidores, String uf, String regiao) {
+    public Registro(LocalDate data , String classe, Integer consumo, Long consumidores, String uf, String regiao) {
         this.data = data;
         this.classe = classe;
         this.consumo = consumo;
@@ -54,11 +55,11 @@ public class Registro {
         this.classe = classe;
     }
 
-    public Double getConsumo() {
+    public Integer getConsumo() {
         return consumo;
     }
 
-    public void setConsumo(Double consumo) {
+    public void setConsumo(Integer consumo) {
         this.consumo = consumo;
     }
 

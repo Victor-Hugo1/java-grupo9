@@ -3,7 +3,6 @@ package grupo9.eleva.etl;
 import grupo9.eleva.logs.Categoria;
 import grupo9.eleva.logs.Log;
 import grupo9.eleva.logs.Origem;
-import grupo9.eleva.s3.ConexaoS3;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -19,11 +18,12 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ExtracaoDados {
     private List<Registro> registros = new ArrayList<>();
     private JdbcTemplate jdbcTemplate;
-    private static List<Log> logs = new ArrayList<>(ConexaoS3.getLogList());
+    private static List<Log> logs = new ArrayList<>();
 
     public ExtracaoDados(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -40,6 +40,7 @@ public class ExtracaoDados {
     public JdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;
     }
+
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -56,51 +57,52 @@ public class ExtracaoDados {
         return data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
-    public List<Registro> extrairDados(String nomeArquivo, InputStream arquivo) {
+    public void extrairDadosEmBatch(String nomeArquivo, InputStream arquivo, Consumer<List<Registro>> processadorLista) {
+        Log log = new Log(LocalDateTime.now(), Origem.EXTRACAO, Categoria.INFO,
+                "Iniciando processo de extração de dados do arquivo %s".formatted(nomeArquivo));
+        System.out.println(log);
+        logs.add(log);
 
         try {
-            Workbook workbook;
-
-            if (nomeArquivo.endsWith(".xlsx")) {
-                workbook = new XSSFWorkbook(arquivo);
-            } else {
-                workbook = new HSSFWorkbook(arquivo);
-            }
-
+            Workbook workbook = nomeArquivo.endsWith(".xlsx") ? new XSSFWorkbook(arquivo) : new HSSFWorkbook(arquivo);
             Sheet sheet = workbook.getSheetAt(0);
 
+            final int BATCH_SIZE = 2000;
+            List<Registro> listaRegistros = new ArrayList<>(BATCH_SIZE);
+
             for (Row row : sheet) {
-                if (row.getRowNum() == 0) {
-                    for (int i = 0; i < 6; i++) {
-                        String coluna = row.getCell(i).getStringCellValue(); // aqui pegamos as colunas
-                    }
-                    continue;
-                }
+                if (row.getRowNum() == 0) continue;
+
                 Registro registroDados = new Registro();
                 registroDados.setData(conversorData(row.getCell(0).getDateCellValue()));
                 registroDados.setUf(row.getCell(1).getStringCellValue());
                 registroDados.setRegiao(row.getCell(2).getStringCellValue());
                 registroDados.setClasse(row.getCell(3).getStringCellValue());
-                Integer consumoFormatado = (int) row.getCell(4).getNumericCellValue();
-                registroDados.setConsumo((double) consumoFormatado);
-                Integer consumidorFormatado = (int) row.getCell(5).getNumericCellValue();
-                registroDados.setConsumidores((long) consumidorFormatado);
+                registroDados.setConsumo((int) row.getCell(4).getNumericCellValue());
+                registroDados.setConsumidores((long) row.getCell(5).getNumericCellValue());
 
+                listaRegistros.add(registroDados);
 
+                if (listaRegistros.size() >= BATCH_SIZE) {
+                    processadorLista.accept(new ArrayList<>(listaRegistros));
+                    listaRegistros.clear();
+                }
 
-                Log log = new Log(LocalDateTime.now(), Origem.EXTRACAO, Categoria.INFO, "Lendo linha: " + row.getRowNum());
-                System.out.println("Extraindo dado do arquivo: " + log);
-
-                logs.add(log);
-                registros.add(registroDados);
-
+                if (row.getRowNum() % 1000 == 0) {
+                    log = new Log(LocalDateTime.now(), Origem.EXTRACAO, Categoria.INFO,
+                            "Lidas até a linha: " + row.getRowNum());
+                    System.out.println(log);
+                    logs.add(log);
+                }
             }
-            return registros;
+
+
+            if (!listaRegistros.isEmpty()) {
+                processadorLista.accept(listaRegistros);
+            }
 
         } catch (IOException e) {
-
             throw new RuntimeException(e);
         }
     }
-
 }

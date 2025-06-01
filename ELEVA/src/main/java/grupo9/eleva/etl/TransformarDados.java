@@ -3,7 +3,7 @@ package grupo9.eleva.etl;
 import grupo9.eleva.logs.Categoria;
 import grupo9.eleva.logs.Log;
 import grupo9.eleva.logs.Origem;
-import org.springframework.jdbc.core.JdbcTemplate; // Importe JdbcTemplate para passar para EnviarDados
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.List;
 public class TransformarDados {
     private static List<Log> logs;
     private EnviarDados enviarDados;
-
+    int contadorLotes = 0;
 
     public TransformarDados(JdbcTemplate jdbcTemplate) {
         this.logs = new ArrayList<>(ExtracaoDados.getLogs());
@@ -32,13 +32,13 @@ public class TransformarDados {
         System.out.println(log);
         logs.add(log);
 
-        final int BATCH_SIZE = 2000; // Tamanho do lote. Teste diferentes valores para otimização.
+        final int BATCH_SIZE = 2000;
         for (int i = 0; i < registrosExtraidos.size(); i += BATCH_SIZE) {
             int end = Math.min(i + BATCH_SIZE, registrosExtraidos.size());
             List<Registro> subList = registrosExtraidos.subList(i, end);
             enviarDados.enviarDadosConsumo(subList);
 
-            Log batchLog = new Log(LocalDateTime.now(), Origem.TRANSFORMAR, Categoria.INFO, "Transformados e enviados %d registros (lote de %d)".formatted(subList.size(), (i / BATCH_SIZE) + 1));
+            Log batchLog = new Log(LocalDateTime.now(), Origem.TRANSFORMAR, Categoria.INFO, "Transformados e enviados %d registros (lote de %d)".formatted(subList.size(),contadorLotes++ ));
             System.out.println(batchLog);
             logs.add(batchLog);
         }
