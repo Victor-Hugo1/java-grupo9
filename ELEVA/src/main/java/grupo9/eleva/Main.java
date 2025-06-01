@@ -26,7 +26,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         try {
-
             // Processo de conexao S3
             S3Client s3Client = new ConexaoS3().getS3Client(); // Commita essa linha para teste local
             ConexaoS3 conexaoS3 = new ConexaoS3(); // Commita essa linha para teste local

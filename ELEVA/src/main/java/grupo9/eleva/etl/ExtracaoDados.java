@@ -54,7 +54,7 @@ public class ExtracaoDados {
     }
 
     private LocalDate conversorData(Date data) {
-        return data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return data.toInstant().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDate();
     }
 
     public void extrairDadosEmBatch(String nomeArquivo, InputStream arquivo, Consumer<List<Registro>> processadorLista) {
