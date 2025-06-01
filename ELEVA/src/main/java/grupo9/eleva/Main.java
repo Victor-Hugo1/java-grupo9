@@ -32,10 +32,10 @@ public class Main {
             Log log = new Log(LocalDateTime.now(), Origem.CONEXAO_S3, Categoria.INFO, "Conexão realizada com sucesso");
             System.out.println("Conexão com bucket S3 " + log); // Commita essa linha para teste local
 
-           conexaoS3.adicionarLog(log);// Commita essa linha para teste local
+           conexaoS3.adicionarLog(log); // Commita essa linha para teste local
 
-           String bucketName = "eleva-s3";// Commita essa linha para teste local
-           String key = "dados-excel/Dados(Grupo09).xlsx";// Commita essa linha para teste local
+           String bucketName = "eleva-s3"; // Commita essa linha para teste local
+           String key = "dados-excel/Dados(Grupo09).xlsx"; // Commita essa linha para teste local
            String nomeArquivo = "Dados(Grupo09).xlsx";
 
            InputStream inputStream = s3Client.getObject(GetObjectRequest.builder() // Commita essa linha para teste local
@@ -53,10 +53,9 @@ public class Main {
             System.out.println("Realizando a conexão com o MYSQL: " + log );
 
             extracaoDados.extrairDadosEmBatch(nomeArquivo, arquivo, batch -> {
-                dataTransform.transformarDados(batch); // transforma e envia o batch para o banco
+                dataTransform.transformarDados(batch);
             });
 
-            // Fecha o arquivo
             arquivo.close();
 
             EnviarDados enviarDados = new EnviarDados(jdbcTemplate);
