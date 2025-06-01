@@ -3,9 +3,10 @@ package grupo9.eleva.etl;
 import grupo9.eleva.logs.Categoria;
 import grupo9.eleva.logs.Log;
 import grupo9.eleva.logs.Origem;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -13,8 +14,8 @@ import java.util.List;
 
 public class EnviarDados {
 
-    private JdbcTemplate jdbcTemplate;
-    private List<Log> logsEnviarDados;
+    private final JdbcTemplate jdbcTemplate;
+    private final List<Log> logsEnviarDados;
 
     public EnviarDados(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -22,41 +23,65 @@ public class EnviarDados {
     }
 
     public void enviarDadosConsumo(List<Registro> registros) {
-
-        Log log = new Log(LocalDateTime.now(), Origem.ENVIAR, Categoria.INFO, "Iniciando envio de lote de %d registros para o banco de dados".formatted(registros.size()));
-        System.out.println("Realizando o envio dos registros para o banco " + log);
+        Log log = new Log(LocalDateTime.now(), Origem.ENVIAR, Categoria.INFO,
+                "Iniciando envio de lote de %d registros para o banco de dados (transação manual)".formatted(registros.size()));
+        System.out.println(log);
         logsEnviarDados.add(log);
 
         String sql = "INSERT INTO energia_historico (dataHora, classe, consumo, consumidores, uf, regiao) VALUES (?, ?, ?, ?, ?, ?)";
 
+        DataSource dataSource = jdbcTemplate.getDataSource();
+        Connection conn = null;
+
         try {
-            jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    Registro dados = registros.get(i);
-                    // Otimização: Evite conversões desnecessárias. Use java.sql.Date.valueOf diretamente do LocalDate.
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                for (Registro dados : registros) {
                     ps.setDate(1, java.sql.Date.valueOf(dados.getData()));
                     ps.setString(2, dados.getClasse());
                     ps.setDouble(3, dados.getConsumo());
                     ps.setLong(4, dados.getConsumidores());
                     ps.setString(5, dados.getUf());
                     ps.setString(6, dados.getRegiao());
+                    ps.addBatch();
                 }
 
-                @Override
-                public int getBatchSize() {
-                    return registros.size();
-                }
-            });
-            Log successLog = new Log(LocalDateTime.now(), Origem.ENVIAR, Categoria.INFO, "Lote de %d registros enviado com sucesso!".formatted(registros.size()));
-            System.out.println(successLog);
-            logsEnviarDados.add(successLog);
+                ps.executeBatch();
+                conn.commit();
+            }
 
-        } catch (Exception e) {
-            Log errorLog = new Log(LocalDateTime.now(), Origem.ENVIAR, Categoria.ERRO, "Erro ao enviar lote de registros: %s".formatted(e.getMessage()));
-            System.err.println(errorLog);
-            logsEnviarDados.add(errorLog);
-            throw new RuntimeException("Falha ao enviar dados para o banco: " + e.getMessage(), e);
+            Log envioComSucesso = new Log(LocalDateTime.now(), Origem.ENVIAR, Categoria.INFO,
+                    "Lote de %d registros enviado com sucesso!".formatted(registros.size()));
+            System.out.println(envioComSucesso);
+            logsEnviarDados.add(envioComSucesso);
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                    System.err.println("Rollback executado devido a erro.");
+                } catch (SQLException ex) {
+                    System.err.println("Erro durante rollback: " + ex.getMessage());
+                }
+            }
+
+            Log envioComErro = new Log(LocalDateTime.now(), Origem.ENVIAR, Categoria.ERRO,
+                    "Erro ao enviar lote de registros: %s".formatted(e.getMessage()));
+            System.err.println(envioComErro);
+            logsEnviarDados.add(envioComErro);
+            throw new RuntimeException("Falha ao enviar dados para o banco", e);
+
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ex) {
+                    System.err.println("Erro ao fechar conexão: " + ex.getMessage());
+                }
+            }
         }
     }
 
@@ -67,23 +92,21 @@ public class EnviarDados {
         }
 
         String sql = "INSERT INTO log (dataHora, origem, categoria, mensagem) VALUES (?, ?, ?, ?)";
-        try {
-            jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    Log logsEnviados = logsEnviarDados.get(i);
-                    ps.setTimestamp(1, java.sql.Timestamp.valueOf(logsEnviados.getData()));
-                    ps.setString(2, logsEnviados.getOrigem().name());
-                    ps.setString(3, logsEnviados.getCategoria().name());
-                    ps.setString(4, logsEnviados.getMensagem());
-                }
 
-                @Override
-                public int getBatchSize() {
-                    return logsEnviarDados.size();
+        try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                for (Log log : logsEnviarDados) {
+                    ps.setTimestamp(1, java.sql.Timestamp.valueOf(log.getData()));
+                    ps.setString(2, log.getOrigem().name());
+                    ps.setString(3, log.getCategoria().name());
+                    ps.setString(4, log.getMensagem());
+                    ps.addBatch();
                 }
-            });
-            System.out.println("Todos os logs enviados para o banco de dados com sucesso!");
+                ps.executeBatch();
+                conn.commit();
+                System.out.println("Todos os logs enviados para o banco de dados com sucesso!");
+            }
         } catch (Exception e) {
             System.err.println("Erro ao enviar logs para o banco de dados: " + e.getMessage());
         }
