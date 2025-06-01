@@ -2,24 +2,24 @@ package grupo9.eleva.etl;
 
 import java.time.LocalDate;
 
-public class DadosEleva {
-    private Double consumo;
+public class Registro {
     private LocalDate data;
     private String classe;
+    private Double consumo;
     private Long consumidores;
     private String uf;
     private String regiao;
 
-    public DadosEleva() {
+    public Registro() {
     }
 
-    public DadosEleva(LocalDate data, String uf, String regiao, String classe, Double consumo, Long consumidores) {
+    public Registro(LocalDate data , String classe, Double consumo, Long consumidores, String uf, String regiao) {
         this.data = data;
-        this.uf = uf;
-        this.regiao = regiao;
         this.classe = classe;
         this.consumo = consumo;
         this.consumidores = consumidores;
+        this.uf = uf;
+        this.regiao = regiao;
     }
 
     public LocalDate getData() {
