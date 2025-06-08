@@ -77,6 +77,12 @@
       <version>8.0.33</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.slack.api</groupId>
+      <artifactId>slack-api-client</artifactId>
+      <version>1.38.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>

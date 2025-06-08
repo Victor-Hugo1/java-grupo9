@@ -3,6 +3,8 @@ package grupo9.eleva.etl;
 import grupo9.eleva.logs.Categoria;
 import grupo9.eleva.logs.Log;
 import grupo9.eleva.logs.Origem;
+import grupo9.eleva.slack.MonitorCliente;
+import grupo9.eleva.slack.SlackWebhookSender;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;

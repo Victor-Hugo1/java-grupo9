@@ -15,6 +15,9 @@ public class Log {
         this.mensagem = mensagem;
     }
 
+    public Log() {
+    }
+
     public LocalDateTime getData() {
         return data;
     }
