@@ -8,7 +8,7 @@ import java.net.http.HttpResponse;
 public class  SlackWebhookSender {
 
 
-    private static final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
+    private static final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
 
     public void enviarMensagem(String mensagem) {
         try {

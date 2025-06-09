@@ -51,9 +51,9 @@ public class MonitorCliente {
 
                             if (naoEnviados != null && naoEnviados > 0) {
 
-                                String mensagem = "📨 Você recebeu " + naoEnviados + " novos leads que ainda não foram processados.";
+                                String mensagem = "\uD83D\uDCE2 Atenção: você tem " + naoEnviados + " novos leads aguardando processamento. Acesse o sistema para gerenciá-los.";
                                 slackSender.enviarMensagem(mensagem);
-
+                                System.out.println("Enviando mensagem para o SLACK do processo LEADS");
                                 String sqlUpdate = "UPDATE leads SET foiEnviado = true WHERE foiEnviado = false";
                                 jdbcTemplate.update(sqlUpdate);
                             }
@@ -62,7 +62,8 @@ public class MonitorCliente {
                         }
 
                         if (Boolean.TRUE.equals(processoEtlAtivo)) {
-                            String mensagem = "O seu processo de ETL diário acabou de ser finalizado!! Para melhor esclarecimento, acesse o site!";
+                            System.out.println("Enviando mensagem para o SLACK do processo ETL");
+                            String mensagem = "\uD83D\uDD5B O processo de ETL programado para hoje foi finalizado com sucesso. Acesse o sistema para conferir os dados mais recentes.";
                             slackSender.enviarMensagem(mensagem);
                         } else {
                             System.out.println("O envio de notificações do processo de ETL está desligado");
