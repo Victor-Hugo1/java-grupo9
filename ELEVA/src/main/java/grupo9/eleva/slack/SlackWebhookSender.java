@@ -1,14 +1,14 @@
-package slackConnection;
+package grupo9.eleva.slack;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class SlackWebhookSender {
+public class  SlackWebhookSender {
 
 
-    private static final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
+    private static final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
 
     public void enviarMensagem(String mensagem) {
         try {
